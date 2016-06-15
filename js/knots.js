@@ -232,17 +232,64 @@ class Knots {
     }
 
     addWalls() {
-        //this.walls.push(new KnotsWall(this, 3, 2, 3, 3));
-        //this.walls.push(new KnotsWall(this, 3, 3, 2, 3));
-        this.walls.push(new KnotsWall(this, 0, -1, 0, 0));
-        this.walls.push(new KnotsWall(this, 0, 0, -1, 0));
+
+
+        this.walls.push(new KnotsWall(this, 3, -3, 3, -2));
+        this.walls.push(new KnotsWall(this, 3, -2, 3, -1));
+
+
+        this.walls.push(new KnotsWall(this, 0, -3, 1, -3));
+        this.walls.push(new KnotsWall(this, 1, -3, 1, -2));
+
+        this.walls.push(new KnotsWall(this, -3, -3, -2, -3));
+
+        this.walls.push(new KnotsWall(this, 1, 1, 2, 1));
+        this.walls.push(new KnotsWall(this, 2, 1, 3, 1));
+        this.walls.push(new KnotsWall(this, 1, 2, 2, 2));
+        this.walls.push(new KnotsWall(this, 2, 2, 3, 2));
+        this.walls.push(new KnotsWall(this, 1, 1, 1, 2));
+        this.walls.push(new KnotsWall(this, 2, 1, 2, 2));
+        this.walls.push(new KnotsWall(this, 3, 1, 3, 2));
+        this.walls.push(new KnotsWall(this, 2, 0, 2, 1));
+        this.walls.push(new KnotsWall(this, 2, 2, 2, 3));
+
+
+        this.walls.push(new KnotsWall(this, -3, 3, -2, 3));
+        this.walls.push(new KnotsWall(this, -2, 3, -1, 3));
+        this.walls.push(new KnotsWall(this, -1, 3, 0, 3));
+
+        this.walls.push(new KnotsWall(this, -3, 2, -2, 2));
+        this.walls.push(new KnotsWall(this, -2, 2, -1, 2));
+
+        this.walls.push(new KnotsWall(this, -3, 1, -2, 1));
+        this.walls.push(new KnotsWall(this, -2, 1, -1, 1));
+
+        this.walls.push(new KnotsWall(this, -3, 0, -2, 0));
+        this.walls.push(new KnotsWall(this, -2, 0, -1, 0));
+        //this.walls.push(new KnotsWall(this, -1, 0, 0, 0));
+
+        this.walls.push(new KnotsWall(this, -3, -1, -2, -1));
+        this.walls.push(new KnotsWall(this, -2, -1, -1, -1));
+        this.walls.push(new KnotsWall(this, -1, -1, 0, -1));
+
+        this.walls.push(new KnotsWall(this, -3, -1, -3, 0));
+        this.walls.push(new KnotsWall(this, -3, 0, -3, 1));
+        this.walls.push(new KnotsWall(this, -3, 1, -3, 2));
+        this.walls.push(new KnotsWall(this, -3, 2, -3, 3));
+
+        this.walls.push(new KnotsWall(this, -2, -1, -2, 0));
+        //this.walls.push(new KnotsWall(this, -2, 0, -2, 1));
+        this.walls.push(new KnotsWall(this, -2, 1, -2, 2));
+        this.walls.push(new KnotsWall(this, -2, 2, -2, 3));
+
+        this.walls.push(new KnotsWall(this, -1, -2, -1, -1));
+        this.walls.push(new KnotsWall(this, -1, -1, -1, 0));
         this.walls.push(new KnotsWall(this, -1, 0, -1, 1));
-        this.walls.push(new KnotsWall(this, -1, 1, 0, 1));
-        this.walls.push(new KnotsWall(this, 0, 1, 1, 1));
-        this.walls.push(new KnotsWall(this, 1, 1, 1, 0));
-        this.walls.push(new KnotsWall(this, 1, 0, 0, 0));
-        this.walls.push(new KnotsWall(this, 0, 0, 0, 1));
-        this.walls.push(new KnotsWall(this, 0, 1, 0, 2));
+        this.walls.push(new KnotsWall(this, -1, 1, -1, 2));
+        this.walls.push(new KnotsWall(this, -1, 2, -1, 3));
+
+        this.walls.push(new KnotsWall(this, 0, -1, 0, 0));
+
         return this;
     }
 
