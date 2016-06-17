@@ -180,9 +180,23 @@ var LinealAlgebra = {
         return LinealAlgebra.aob(a, b) / abs_a / abs_b;
     },
 
-    ab_deg: function (a, b) {
-        var deg_s = Math.asin(LinealAlgebra.sin_ab(a, b)),
-            deg_c = Math.acos(LinealAlgebra.cos_ab(a, b));
-        return (deg_s < 0 ? -deg_c : deg_c) || deg_c;
+    ab_rad: function (a, b) {
+        var rad_s = Math.asin(LinealAlgebra.sin_ab(a, b)),
+            rad_c = Math.acos(LinealAlgebra.cos_ab(a, b));
+        return (rad_s < 0 ? -rad_c : rad_c) || rad_c;
+    },
+
+    xy2radial: function (a) {
+        return {r: LinealAlgebra.a_length(a), a: LinealAlgebra.ab_rad([1, 0], a)};
+    },
+
+    radial2xy: function (ra, rounded) {
+        var x = ra.r * Math.sin(ra.a),
+            y = ra.r * Math.cos(ra.a);
+        if (rounded) {
+            x = Math.round(x);
+            y = Math.round(y);
+        }
+        return [x, y];
     }
 };
