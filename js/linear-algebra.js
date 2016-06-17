@@ -191,8 +191,8 @@ var LinealAlgebra = {
     },
 
     radial2xy: function (ra, rounded) {
-        var x = ra.r * Math.sin(ra.a),
-            y = ra.r * Math.cos(ra.a);
+        var x = ra.r * Math.cos(ra.a),
+            y = ra.r * Math.sin(ra.a);
         if (rounded) {
             x = Math.round(x);
             y = Math.round(y);

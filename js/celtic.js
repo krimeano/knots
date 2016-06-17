@@ -174,20 +174,16 @@ Celtic.Vector = class Celtic_Vector {
 
         var ra_a = LA.xy2radial(LA.minus_a(this.vector)),
             ra_b = LA.xy2radial(this.vector_next.vector),
-            rad = (ra_a.a + ra_b.a + (ra_b.a == ra_b.a ? 2 * Math.PI : 0)) / 2;
+            rad = (ra_a.a + ra_b.a + (ra_a.a <= ra_b.a ? 2 * Math.PI : 0)) / 2;
 
-        console.log(this.end.coords, this.vector, this.vector_next.vector, rad / Math.PI);
-        //var v_minus = LA.minus_a(this.vector),
-        //    ra_a = LA.xy2radial(v_minus),
-        //    ra_b = LA.xy2radial(this.vector_next.vector);
-        //console.log(ra_a.a / Math.PI, ra_b.a / Math.PI);
-        //var c = LA.radial2xy({r: 20, a: rad_abs}, true), c_coords = LA.apb(this.end.coords, c);
-        //ctx.beginPath();
-        //ctx.strokeStyle = 'black';
-        //ctx.lineWidth = 1;
-        //ctx.moveTo(this.end.coords[0], this.end.coords[1]);
-        //ctx.lineTo(c_coords[0], c_coords[1]);
-        //ctx.stroke();
+        var c = LA.radial2xy({r: (ra_a.r + ra_b.r) / 4, a: rad}, true),
+            c_coords = LA.apb(this.end.coords, c);
+        ctx.beginPath();
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.moveTo(this.end.coords[0], this.end.coords[1]);
+        ctx.lineTo(c_coords[0], c_coords[1]);
+        ctx.stroke();
 
         //console.log(this.end.coords, c);
         //var half_out = LA.apb(this.vector, this.vector_next.vector);
