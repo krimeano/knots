@@ -216,26 +216,50 @@ Celtic.Vector = class Celtic_Vector {
         return this;
     }
 
-    drawIn() {
-        var ctx = this.celtic.ctx,
+    drawBandLine(p0, p1, v0, v1){
+
+    }
+
+    drawBand(p, support, direction, color, w) {
+        var dd = {i: -1, o: 1},
             c = LA.centerPoint(this.begin.coords, this.end.coords),
-            s_coords = LA.apb(this.begin.coords, this.support_prev),
-            dirIn = LA.rotate_a_deg(-45, this.vector),
-            dirS = LA.rotate_a_deg(-90, this.support_prev),
+            s_coords = LA.apb(p, support),
+            dirC = LA.rotate_a_deg(dd[direction] * 45, this.vector),
+            dirS = LA.rotate_a_deg(dd[direction] * 90, support),
             s0 = LA.pa2s(s_coords, dirS),
-            s1 = LA.pa2s(c, dirIn),
+            s1 = LA.pa2s(c, dirC),
             cross_coords = LA.straights_cross(s0, s1),
             sdc = LA.centerPoint(s_coords, cross_coords),
-            dc = LA.centerPoint(c, cross_coords);
-
-        //console.log(s0, s1, cross_coords);
+            dc = LA.centerPoint(c, cross_coords),
+            ctx = this.celtic.ctx,
+            isParallel = cross_coords[0] == Infinity || cross_coords[0] == -Infinity;
         ctx.beginPath();
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = color;
         ctx.moveTo(c[0], c[1]);
-        if (cross_coords[0] == Infinity || cross_coords[0] == -Infinity) {
-            ctx.lineTo(s_coords[0], s_coords[1]);
+
+        if (!w) {
+            if (isParallel) {
+                ctx.lineTo(s_coords[0], s_coords[1]);
+            } else {
+                ctx.bezierCurveTo(dc[0], dc[1], sdc[0], sdc[1], s_coords[0], s_coords[1]);
+            }
         } else {
-            ctx.bezierCurveTo(dc[0], dc[1], sdc[0], sdc[1], s_coords[0], s_coords[1]);
+
+            var c_radial = LA.xy2radial(this.vector),
+                s_radial = LA.xy2radial(support),
+                shift_c = LA.radial2xy({r: w * c_radial.r / 2, a: c_radial.a}),
+                shift_s = LA.radial2xy({r: w * s_radial.r, a: s_radial.a});
+            ctx.lineTo(c[0] + dd[direction] * shift_c[0], c[1] + dd[direction] * shift_c[1]);
+
+            if (isParallel) {
+                ctx.lineTo(s_coords[0] - shift_s[0], s_coords[1] - shift_s[1]);
+                ctx.lineTo(s_coords[0] + shift_s[0], s_coords[1] + shift_s[1]);
+                ctx.lineTo(c[0] - dd[direction] * shift_c[0], c[1] - dd[direction] * shift_c[1]);
+            } else {
+                ctx.bezierCurveTo(dc[0] + dd[direction] * shift_c[0], dc[1] + dd[direction] * shift_c[1], sdc[0] - shift_s[0], sdc[1] - shift_s[1], s_coords[0] - shift_s[0], s_coords[1] - shift_s[1]);
+                ctx.lineTo(s_coords[0] + shift_s[0], s_coords[1] + shift_s[1]);
+                ctx.bezierCurveTo(sdc[0] + shift_s[0], sdc[1] + shift_s[1], dc[0] - dd[direction] * shift_c[0], dc[1] - dd[direction] * shift_c[1], c[0] - dd[direction] * shift_c[0], c[1] - dd[direction] * shift_c[1]);
+            }
         }
         ctx.stroke();
 
@@ -243,28 +267,12 @@ Celtic.Vector = class Celtic_Vector {
         return this;
     }
 
-    drawOut() {
-        var ctx = this.celtic.ctx,
-            c = LA.centerPoint(this.begin.coords, this.end.coords),
-            s_coords = LA.apb(this.end.coords, this.support_next),
-            dirOut = LA.rotate_a_deg(45, this.vector),
-            dirS = LA.rotate_a_deg(90, this.support_next),
-            s0 = LA.pa2s(s_coords, dirS),
-            s1 = LA.pa2s(c, dirOut),
-            cross_coords = LA.straights_cross(s0, s1),
-            sdc = LA.centerPoint(s_coords, cross_coords),
-            dc = LA.centerPoint(c, cross_coords);
-        ctx.beginPath();
-        ctx.strokeStyle = 'white';
-        ctx.moveTo(c[0], c[1]);
-        if (cross_coords[0] == Infinity || cross_coords[0] == -Infinity) {
-            ctx.lineTo(s_coords[0], s_coords[1]);
-        } else {
-            ctx.bezierCurveTo(dc[0], dc[1], sdc[0], sdc[1], s_coords[0], s_coords[1]);
-        }
-        ctx.stroke();
+    drawIn() {
+        return this.drawBand(this.begin.coords, this.support_prev, 'i', 'black', 0);
+    }
 
-        return this;
+    drawOut() {
+        return this.drawBand(this.end.coords, this.support_next, 'o', 'white', 0);
     }
 
 };
