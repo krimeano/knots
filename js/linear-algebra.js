@@ -2,8 +2,8 @@
 var LinealAlgebra = {
     /**
      * Scalar product of two vectors
-     * @param {Array} a
-     * @param {Array} b
+     * @param {Number[]} a
+     * @param {Number[]} b
      * @return {Number}
      */
     aob: function (a, b) {
@@ -18,8 +18,8 @@ var LinealAlgebra = {
 
     /**
      * Vector product of two vectors
-     * @param {Array} a
-     * @param {Array} b
+     * @param {Number[]} a
+     * @param {Number[]} b
      * @returns {*}
      */
     axb: function (a, b) {
@@ -46,8 +46,8 @@ var LinealAlgebra = {
      * return minor of matrix
      * @param {Number} i
      * @param {Number} j
-     * @param {Array[]} matrix
-     * @returns {Array[]}
+     * @param {Number[][]} matrix
+     * @returns {Number[][]}
      */
     minor: function (i, j, matrix) {
         return LinealAlgebra.minor_sub(j, matrix.slice(0, i).concat(matrix.slice(i + 1)))
@@ -56,8 +56,8 @@ var LinealAlgebra = {
     /**
      * reduces one column of matrix without row
      * @param {Number} j
-     * @param {Array[]} sub_matrix
-     * @returns {Array[]}
+     * @param {Number[][]} sub_matrix
+     * @returns {Number[][]}
      */
     minor_sub: function (j, sub_matrix) {
         return sub_matrix.map(y=>y.slice(0, j).concat(y.slice(j + 1)));
@@ -65,7 +65,7 @@ var LinealAlgebra = {
 
     /**
      *
-     * @param {Array[]} matrix
+     * @param {Number[][]} matrix
      * @returns {Number}
      */
     det: function (matrix) {
@@ -88,9 +88,9 @@ var LinealAlgebra = {
 
     /**
      * Product of matrix and vector
-     * @param {Array[]} matrix
-     * @param {Array} a
-     * @returns {Array}
+     * @param {Number[][]} matrix
+     * @param {Number[]} a
+     * @returns {Number[]}
      */
     mxa: function (matrix, a) {
         if (!matrix.length) {
@@ -106,8 +106,8 @@ var LinealAlgebra = {
     /**
      *
      * @param {Number} rad
-     * @param {Array} a
-     * @returns {Array}
+     * @param {Number[]} a
+     * @returns {Number[]}
      */
     rotate_a: function (rad, a) {
         var m = [[Math.cos(rad), -Math.sin(rad)], [Math.sin(rad), Math.cos(rad)]];
@@ -117,8 +117,8 @@ var LinealAlgebra = {
     /**
      *
      * @param {Number} deg
-     * @param {Array} a
-     * @returns {Array}
+     * @param {Number[]} a
+     * @returns {Number[]}
      */
     rotate_a_deg: function (deg, a) {
         return LinealAlgebra.rotate_a(Math.PI * deg / 180, a);
@@ -135,9 +135,9 @@ var LinealAlgebra = {
     /**
      *
      * Creates a vector from two points
-     * @param {Array} p0
-     * @param {Array} p1
-     * @returns {Array}
+     * @param {Number[]} p0
+     * @param {Number[]} p1
+     * @returns {Number[]}
      */
     pp2a: function (p0, p1) {
         if (p0.length !== p1.length) {
@@ -152,9 +152,9 @@ var LinealAlgebra = {
 
     /**
      * Sum of two vectors
-     * @param {Array} a
-     * @param {Array} b
-     * @returns {Array}
+     * @param {Number[]} a
+     * @param {Number[]} b
+     * @returns {Number[]}
      */
     apb: function (a, b) {
         return a.map((x, i)=>x + b[i])
@@ -169,7 +169,7 @@ var LinealAlgebra = {
         if (!abs_a || !abs_b) {
             return NaN;
         }
-        return LinealAlgebra.axb(a, b) / abs_a / abs_b;
+        return parseFloat((LinealAlgebra.axb(a, b) / abs_a / abs_b).toFixed(5));
     },
 
     cos_ab: function (a, b) {
@@ -177,12 +177,13 @@ var LinealAlgebra = {
         if (!abs_a || !abs_b) {
             return NaN;
         }
-        return LinealAlgebra.aob(a, b) / abs_a / abs_b;
+        return parseFloat((LinealAlgebra.aob(a, b) / abs_a / abs_b).toFixed(5));
     },
 
     ab_rad: function (a, b) {
         var rad_s = Math.asin(LinealAlgebra.sin_ab(a, b)),
             rad_c = Math.acos(LinealAlgebra.cos_ab(a, b));
+
         return (rad_s < 0 ? -rad_c : rad_c) || rad_c;
     },
 
@@ -198,5 +199,52 @@ var LinealAlgebra = {
             y = Math.round(y);
         }
         return [x, y];
+    },
+
+
+    weightedX: function (x0, x1, w0, w1) {
+        if (w0 == w1) {
+            return (x0 + x1) / 2;
+        }
+        return (x0 * w0 + x1 * w1) / (w0 + w1);
+    },
+
+    weightedPoint: function (p0, p1, w0, w1) {
+        return p0.map((x, i) => LinealAlgebra.weightedX(x, p1[i], w0, w1))
+    },
+
+    centerPoint: function (p0, p1) {
+        return LinealAlgebra.weightedPoint(p0, p1, 1, 1);
+    },
+
+
+    /**
+     * Finds straight line parameters by point and collinear vector
+     * @param {Number[]} p
+     * @param {Number[]} a
+     * @returns {{A: number, B: number, C: number}}
+     */
+    pa2s: function (p, a) {
+        return {
+            A: -a[1],
+            B: a[0],
+            C: LinealAlgebra.det([p, a])
+        }
+    },
+
+    /**
+     *
+     * @param {{A: number, B: number, C: number}} s0
+     * @param {{A: number, B: number, C: number}} s1
+     * @returns {Number[]}
+     */
+    straights_cross: function (s0, s1) {
+        var d = LinealAlgebra.det([[s0.A, s0.B], [s1.A, s1.B]]),
+            xd = LinealAlgebra.det([[s0.B, s0.C], [s1.B, s1.C]]),
+            yd = LinealAlgebra.det([[s0.C, s0.A], [s1.C, s1.A]]);
+        //if (!d) {
+        //    return [Infinity, Infinity];
+        //}
+        return [xd / d, yd / d];
     }
 };
