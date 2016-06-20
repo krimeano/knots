@@ -31,8 +31,8 @@ class Celtic {
     }
 
     initData() {
-        this.coordinates = [[200, 200], [400, 200], [400, 400], [200, 400]];
-        this.lines = [[0, 1], [1, 2]];
+        this.coordinates = [[200, 200], [400, 200], [600, 200], [200, 400], [400, 400], [600, 400]];
+        this.lines = [[0, 1], [1, 2], [3, 4], [4, 5], [0, 3], [1, 4], [2, 5]];
         this.points = this.coordinates.map(x=>new Celtic.Point(this, x));
         this.vectors = [];
         this.lines.forEach(x=>this.vectors = this.vectors.concat(Celtic.Vector.makeVectors(this, x)));
@@ -165,9 +165,9 @@ Celtic.Vector = class Celtic_Vector {
 
         }
         c = LA.radial2xy({r: cl, a: rad}, true);
-        if ((c0[0] && (c0[0] * c[0] < 0)) || (c0[1] && (c0[1] * c[1] < 0))) {
-            c = [c[0] / Math.sqrt(2), c[1] / Math.sqrt(2)];
-        }
+        //if ((c0[0] && (c0[0] * c[0] < 0)) || (c0[1] && (c0[1] * c[1] < 0))) {
+        //    c = [c[0] / Math.sqrt(2), c[1] / Math.sqrt(2)];
+        //}
         this.support_next = c;
         found.support_prev = c;
 
@@ -191,6 +191,7 @@ Celtic.Vector = class Celtic_Vector {
     }
 
     drawVector() {
+        return this;
         var ctx = this.celtic.ctx,
             shift = this.shift;
         ctx.beginPath();
@@ -216,7 +217,21 @@ Celtic.Vector = class Celtic_Vector {
         return this;
     }
 
-    drawBandLine(p0, p1, v0, v1){
+    drawBandLine(p0, p1, v0, v1) {
+        var s0 = LA.pa2s(p0, v0),
+            s1 = LA.pa2s(p1, v1),
+            cross_coords = LA.straights_cross(s0, s1),
+            isParallel = cross_coords[0] == Infinity || cross_coords[0] == -Infinity,
+            ctx = this.celtic.ctx;
+        ctx.lineTo(p0[0], p0[1]);
+        if (isParallel) {
+            ctx.lineTo(p1[0], p1[1]);
+        } else {
+            var
+                d0 = LA.centerPoint(p0, cross_coords),
+                d1 = LA.centerPoint(p1, cross_coords);
+            ctx.bezierCurveTo(d0[0], d0[1], d1[0], d1[1], p1[0], p1[1]);
+        }
 
     }
 
@@ -226,53 +241,43 @@ Celtic.Vector = class Celtic_Vector {
             s_coords = LA.apb(p, support),
             dirC = LA.rotate_a_deg(dd[direction] * 45, this.vector),
             dirS = LA.rotate_a_deg(dd[direction] * 90, support),
-            s0 = LA.pa2s(s_coords, dirS),
-            s1 = LA.pa2s(c, dirC),
-            cross_coords = LA.straights_cross(s0, s1),
-            sdc = LA.centerPoint(s_coords, cross_coords),
-            dc = LA.centerPoint(c, cross_coords),
-            ctx = this.celtic.ctx,
-            isParallel = cross_coords[0] == Infinity || cross_coords[0] == -Infinity;
+            ctx = this.celtic.ctx;
         ctx.beginPath();
-        ctx.strokeStyle = color;
         ctx.moveTo(c[0], c[1]);
 
         if (!w) {
-            if (isParallel) {
-                ctx.lineTo(s_coords[0], s_coords[1]);
-            } else {
-                ctx.bezierCurveTo(dc[0], dc[1], sdc[0], sdc[1], s_coords[0], s_coords[1]);
-            }
+            ctx.strokeStyle = color;
+            this.drawBandLine(c, s_coords, dirC, dirS);
+            ctx.stroke();
         } else {
-
+            ctx.fillStyle = color;
             var c_radial = LA.xy2radial(this.vector),
                 s_radial = LA.xy2radial(support),
                 shift_c = LA.radial2xy({r: w * c_radial.r / 2, a: c_radial.a}),
                 shift_s = LA.radial2xy({r: w * s_radial.r, a: s_radial.a});
-            ctx.lineTo(c[0] + dd[direction] * shift_c[0], c[1] + dd[direction] * shift_c[1]);
-
-            if (isParallel) {
-                ctx.lineTo(s_coords[0] - shift_s[0], s_coords[1] - shift_s[1]);
-                ctx.lineTo(s_coords[0] + shift_s[0], s_coords[1] + shift_s[1]);
-                ctx.lineTo(c[0] - dd[direction] * shift_c[0], c[1] - dd[direction] * shift_c[1]);
-            } else {
-                ctx.bezierCurveTo(dc[0] + dd[direction] * shift_c[0], dc[1] + dd[direction] * shift_c[1], sdc[0] - shift_s[0], sdc[1] - shift_s[1], s_coords[0] - shift_s[0], s_coords[1] - shift_s[1]);
-                ctx.lineTo(s_coords[0] + shift_s[0], s_coords[1] + shift_s[1]);
-                ctx.bezierCurveTo(sdc[0] + shift_s[0], sdc[1] + shift_s[1], dc[0] - dd[direction] * shift_c[0], dc[1] - dd[direction] * shift_c[1], c[0] - dd[direction] * shift_c[0], c[1] - dd[direction] * shift_c[1]);
+            if (dd[direction] < 1) {
+                shift_c = LA.minus_a(shift_c);
             }
+            this.drawBandLine(LA.apb(c, shift_c), LA.apb(s_coords, LA.minus_a(shift_s)), dirC, dirS);
+            this.drawBandLine(LA.apb(s_coords, shift_s), LA.apb(c, LA.minus_a(shift_c)), dirS, dirC);
+            ctx.closePath();
+            ctx.fill()
         }
-        ctx.stroke();
 
 
         return this;
     }
 
     drawIn() {
-        return this.drawBand(this.begin.coords, this.support_prev, 'i', 'black', 0);
+        return this
+            .drawBand(this.begin.coords, this.support_prev, 'i', 'black', 0.6)
+            .drawBand(this.begin.coords, this.support_prev, 'i', 'white', 0.5);
     }
 
     drawOut() {
-        return this.drawBand(this.end.coords, this.support_next, 'o', 'white', 0);
+        return this
+            .drawBand(this.end.coords, this.support_next, 'o', 'black', 0.6)
+            .drawBand(this.end.coords, this.support_next, 'o', 'white', 0.5);
     }
 
 };
