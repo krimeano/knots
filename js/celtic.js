@@ -270,14 +270,14 @@ Celtic.Vector = class Celtic_Vector {
 
     drawIn() {
         return this
-            .drawBand(this.begin.coords, this.support_prev, 'i', 'black', 0.6)
-            .drawBand(this.begin.coords, this.support_prev, 'i', 'white', 0.5);
+            .drawBand(this.begin.coords, this.support_prev, 'i', 'black', 0.5)
+            .drawBand(this.begin.coords, this.support_prev, 'i', 'white', 0.4);
     }
 
     drawOut() {
         return this
-            .drawBand(this.end.coords, this.support_next, 'o', 'black', 0.6)
-            .drawBand(this.end.coords, this.support_next, 'o', 'white', 0.5);
+            .drawBand(this.end.coords, this.support_next, 'o', 'black', 0.5)
+            .drawBand(this.end.coords, this.support_next, 'o', 'white', 0.4);
     }
 
 };
